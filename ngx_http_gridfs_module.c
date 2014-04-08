@@ -419,7 +419,7 @@ static ngx_int_t ngx_http_mongo_authenticate(ngx_log_t *log, ngx_http_gridfs_loc
     ngx_http_mongo_connection_t* mongo_conn;
     ngx_http_mongo_auth_t *mongo_auth;
     mongo_cursor *cursor = NULL;
-    bson empty;
+    const bson* empty;
     char *test;
     int error;
 
@@ -453,8 +453,8 @@ static ngx_int_t ngx_http_mongo_authenticate(ngx_log_t *log, ngx_http_gridfs_loc
     test = (char*)malloc( gridfs_loc_conf->db.len + sizeof(".test"));
     ngx_cpystrn((u_char*)test, (u_char*)gridfs_loc_conf->db.data, gridfs_loc_conf->db.len+1);
     ngx_cpystrn((u_char*)(test+gridfs_loc_conf->db.len),(u_char*)".test", sizeof(".test"));
-    bson_empty(&empty);
-    cursor = mongo_find(&mongo_conn->conn, test, &empty, NULL, 0, 0, 0);
+    empty = bson_shared_empty();
+    cursor = mongo_find(&mongo_conn->conn, test, empty, NULL, 0, 0, 0);
     error =  mongo_cmd_get_last_error(&mongo_conn->conn, (char*)gridfs_loc_conf->db.data, NULL);
     free(test);
     mongo_cursor_destroy(cursor);
